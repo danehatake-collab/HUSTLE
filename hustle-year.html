@@ -1,0 +1,2398 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>HUSTLE YEAR | 12 Week Goal System</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- React & Babel -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-tertiary: #1a1a1a;
+            --bg-card: rgba(26, 26, 26, 0.8);
+            --bg-glass: rgba(255, 255, 255, 0.03);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-medium: rgba(255, 255, 255, 0.1);
+            
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --text-tertiary: rgba(255, 255, 255, 0.4);
+            
+            --accent-blue: #3b82f6;
+            --accent-blue-dim: rgba(59, 130, 246, 0.15);
+            --accent-green: #22c55e;
+            --accent-green-dim: rgba(34, 197, 94, 0.15);
+            --accent-red: #ef4444;
+            --accent-red-dim: rgba(239, 68, 68, 0.15);
+            --accent-yellow: #eab308;
+            --accent-yellow-dim: rgba(234, 179, 8, 0.15);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            --shadow-glow: 0 0 60px rgba(59, 130, 246, 0.1);
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+            
+            --transition-fast: 0.15s ease;
+            --transition-medium: 0.25s ease;
+            --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        html, body, #root {
+            height: 100%;
+            font-family: 'Space Grotesk', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-medium);
+            border-radius: 4px;
+        }
+
+        /* App Container */
+        .app {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            max-width: 480px;
+            margin: 0 auto;
+            position: relative;
+            background: var(--bg-primary);
+        }
+
+        /* Header */
+        .header {
+            padding: 16px 20px;
+            background: linear-gradient(to bottom, var(--bg-primary), transparent);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .week-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .week-number {
+            color: var(--accent-blue);
+            font-weight: 700;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0 20px 120px;
+            scroll-behavior: smooth;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+            transition: var(--transition-medium);
+        }
+
+        .stat-card:hover {
+            border-color: var(--border-medium);
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-value.blue { color: var(--accent-blue); }
+        .stat-value.green { color: var(--accent-green); }
+        .stat-value.yellow { color: var(--accent-yellow); }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Goal Cards */
+        .goals-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .goal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition-medium);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .goal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            opacity: 0;
+            transition: var(--transition-medium);
+        }
+
+        .goal-card:hover {
+            border-color: var(--border-medium);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-card);
+        }
+
+        .goal-card:hover::before {
+            opacity: 1;
+        }
+
+        .goal-card:active {
+            transform: scale(0.98);
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .goal-title {
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.3;
+            flex: 1;
+            padding-right: 12px;
+        }
+
+        .goal-menu-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .goal-menu-btn:hover {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+        }
+
+        .goal-progress {
+            margin-bottom: 16px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .progress-label {
+            color: var(--text-tertiary);
+        }
+
+        .progress-value {
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            border-radius: 3px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .goal-tasks-preview {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .task-chip {
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-xl);
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .task-chip.active {
+            background: var(--accent-blue-dim);
+            color: var(--accent-blue);
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 24px;
+            opacity: 0.3;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            color: var(--text-tertiary);
+            font-size: 14px;
+            max-width: 260px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: linear-gradient(to top, var(--bg-primary) 70%, transparent);
+            padding: 16px 20px calc(16px + var(--safe-area-bottom));
+            z-index: 100;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 20px;
+            border-radius: var(--radius-lg);
+            background: transparent;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            font-family: inherit;
+        }
+
+        .nav-item:hover {
+            color: var(--text-secondary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-blue-dim);
+            color: var(--accent-blue);
+        }
+
+        .nav-item svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .nav-item span {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* FAB Button */
+        .fab {
+            position: fixed;
+            right: 20px;
+            bottom: calc(100px + var(--safe-area-bottom));
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-blue), #2563eb);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+            transition: var(--transition-medium);
+            z-index: 101;
+        }
+
+        .fab:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 30px rgba(59, 130, 246, 0.5);
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        .fab svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 200;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            overflow: hidden;
+            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-glass);
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: calc(90vh - 140px);
+        }
+
+        .modal-footer {
+            padding: 16px 20px calc(16px + var(--safe-area-bottom));
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 15px;
+            transition: var(--transition-fast);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: var(--bg-primary);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        textarea.form-input {
+            resize: none;
+            min-height: 100px;
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 44px;
+        }
+
+        /* Buttons */
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), #2563eb);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+        }
+
+        .btn-danger {
+            background: var(--accent-red-dim);
+            color: var(--accent-red);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        /* Tasks List */
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .task-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .task-input-row .form-input {
+            flex: 1;
+        }
+
+        .task-input-row .form-select {
+            width: 140px;
+        }
+
+        .remove-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            background: var(--accent-red-dim);
+            border: none;
+            color: var(--accent-red);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fast);
+            flex-shrink: 0;
+        }
+
+        .remove-btn:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        .add-task-btn {
+            padding: 12px;
+            background: var(--bg-glass);
+            border: 1px dashed var(--border-medium);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .add-task-btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        /* Goal Detail View */
+        .detail-header {
+            padding: 20px;
+            background: linear-gradient(to bottom, var(--bg-secondary), var(--bg-primary));
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 16px;
+            transition: var(--transition-fast);
+        }
+
+        .back-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .detail-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .detail-progress {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 16px;
+        }
+
+        .detail-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .detail-progress-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .detail-progress-label {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        /* Task Items */
+        .task-section {
+            padding: 20px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            margin-bottom: 10px;
+            transition: var(--transition-medium);
+        }
+
+        .task-item:hover {
+            border-color: var(--border-medium);
+        }
+
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--border-medium);
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fast);
+            flex-shrink: 0;
+        }
+
+        .task-checkbox:hover {
+            border-color: var(--accent-green);
+        }
+
+        .task-checkbox.checked {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .task-checkbox svg {
+            width: 14px;
+            height: 14px;
+            color: white;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: var(--transition-fast);
+        }
+
+        .task-checkbox.checked svg {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-name {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            transition: var(--transition-fast);
+        }
+
+        .task-item.completed .task-name {
+            color: var(--text-tertiary);
+            text-decoration: line-through;
+        }
+
+        .task-frequency {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .task-streak {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: var(--accent-green-dim);
+            border-radius: var(--radius-xl);
+            font-size: 12px;
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        /* Analytics View */
+        .analytics-section {
+            margin-bottom: 32px;
+        }
+
+        .analytics-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+
+        .analytics-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        /* Heatmap Calendar */
+        .heatmap {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 4px;
+        }
+
+        .heatmap-day {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            background: var(--bg-tertiary);
+            transition: var(--transition-fast);
+        }
+
+        .heatmap-day.level-1 { background: rgba(34, 197, 94, 0.2); }
+        .heatmap-day.level-2 { background: rgba(34, 197, 94, 0.4); }
+        .heatmap-day.level-3 { background: rgba(34, 197, 94, 0.6); }
+        .heatmap-day.level-4 { background: var(--accent-green); }
+        .heatmap-day.missed { background: var(--accent-red-dim); }
+
+        .heatmap-legend {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            margin-top: 12px;
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .heatmap-legend-item {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Visual Tracker Grid */
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(28px, 1fr));
+            gap: 6px;
+        }
+
+        .tracker-cell {
+            aspect-ratio: 1;
+            border-radius: var(--radius-sm);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: var(--transition-fast);
+        }
+
+        .tracker-cell.completed {
+            background: var(--accent-green-dim);
+            border-color: var(--accent-green);
+        }
+
+        .tracker-cell.completed svg {
+            width: 14px;
+            height: 14px;
+            color: var(--accent-green);
+        }
+
+        .tracker-summary {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--bg-glass);
+            border-radius: var(--radius-md);
+            margin-top: 16px;
+        }
+
+        .tracker-stat {
+            text-align: center;
+        }
+
+        .tracker-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .tracker-stat-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+        }
+
+        /* Weekly Review */
+        .review-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .review-week {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .review-score {
+            padding: 4px 12px;
+            background: var(--accent-blue-dim);
+            border-radius: var(--radius-xl);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        .review-questions {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .review-question {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .review-answer {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text-primary);
+            min-height: 60px;
+        }
+
+        /* Settings */
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .settings-item:hover {
+            border-color: var(--border-medium);
+        }
+
+        .settings-item-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .settings-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+        }
+
+        .settings-label {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .settings-description {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        /* Dropdown Menu */
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-md);
+            padding: 8px;
+            min-width: 160px;
+            box-shadow: var(--shadow-card);
+            z-index: 50;
+            animation: fadeIn 0.15s ease;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            color: var(--text-secondary);
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+        }
+
+        .dropdown-item.danger {
+            color: var(--accent-red);
+        }
+
+        .dropdown-item.danger:hover {
+            background: var(--accent-red-dim);
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 380px) {
+            .stat-card {
+                padding: 12px;
+            }
+            .stat-value {
+                font-size: 20px;
+            }
+            .goal-title {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useMemo, useRef } = React;
+
+        // ===== ICONS =====
+        const Icons = {
+            Home: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+            ),
+            Chart: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+            ),
+            Calendar: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+            ),
+            Settings: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+            ),
+            Plus: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+            ),
+            X: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            ),
+            Check: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            ),
+            ChevronLeft: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6"/>
+                </svg>
+            ),
+            ChevronRight: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"/>
+                </svg>
+            ),
+            MoreVertical: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="1"/>
+                    <circle cx="12" cy="5" r="1"/>
+                    <circle cx="12" cy="19" r="1"/>
+                </svg>
+            ),
+            Trash: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+            ),
+            Edit: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+            ),
+            Download: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+            ),
+            Upload: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+            ),
+            Target: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle cx="12" cy="12" r="6"/>
+                    <circle cx="12" cy="12" r="2"/>
+                </svg>
+            ),
+            Flame: () => (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                </svg>
+            )
+        };
+
+        // ===== UTILS =====
+        const generateId = () => Math.random().toString(36).substr(2, 9);
+        
+        const getStartOfWeek = (date) => {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(d.setDate(diff));
+        };
+
+        const formatDate = (date) => {
+            return new Date(date).toLocaleDateString('ru-RU', { 
+                day: 'numeric', 
+                month: 'short' 
+            });
+        };
+
+        const getDaysBetween = (start, end) => {
+            const oneDay = 24 * 60 * 60 * 1000;
+            return Math.round(Math.abs((end - start) / oneDay));
+        };
+
+        const FREQUENCY_OPTIONS = [
+            { value: 'daily', label: 'Ежедневно', multiplier: 84 },
+            { value: 'weekly', label: 'Раз в неделю', multiplier: 12 },
+            { value: 'twice-week', label: '2 раза/нед', multiplier: 24 },
+            { value: 'three-week', label: '3 раза/нед', multiplier: 36 },
+            { value: 'workdays', label: 'По будням', multiplier: 60 },
+        ];
+
+        // ===== DATA HOOKS =====
+        const useLocalStorage = (key, initialValue) => {
+            const [storedValue, setStoredValue] = useState(() => {
+                try {
+                    const item = localStorage.getItem(key);
+                    return item ? JSON.parse(item) : initialValue;
+                } catch (error) {
+                    return initialValue;
+                }
+            });
+
+            const setValue = useCallback((value) => {
+                try {
+                    const valueToStore = value instanceof Function ? value(storedValue) : value;
+                    setStoredValue(valueToStore);
+                    localStorage.setItem(key, JSON.stringify(valueToStore));
+                } catch (error) {
+                    console.error(error);
+                }
+            }, [key, storedValue]);
+
+            return [storedValue, setValue];
+        };
+
+        // ===== MAIN APP =====
+        function App() {
+            // State
+            const [goals, setGoals] = useLocalStorage('hustleYear_goals', []);
+            const [completions, setCompletions] = useLocalStorage('hustleYear_completions', {});
+            const [reviews, setReviews] = useLocalStorage('hustleYear_reviews', []);
+            const [settings, setSettings] = useLocalStorage('hustleYear_settings', {
+                startDate: new Date().toISOString().split('T')[0],
+                currentWeek: 1
+            });
+
+            const [activeTab, setActiveTab] = useState('home');
+            const [selectedGoal, setSelectedGoal] = useState(null);
+            const [showCreateModal, setShowCreateModal] = useState(false);
+            const [showReviewModal, setShowReviewModal] = useState(false);
+            const [editingGoal, setEditingGoal] = useState(null);
+            const [selectedTaskForTracker, setSelectedTaskForTracker] = useState(null);
+
+            // Calculate current week
+            const currentWeek = useMemo(() => {
+                const start = new Date(settings.startDate);
+                const now = new Date();
+                const weeks = Math.ceil(getDaysBetween(start, now) / 7);
+                return Math.min(Math.max(weeks, 1), 12);
+            }, [settings.startDate]);
+
+            // Calculate stats
+            const stats = useMemo(() => {
+                const today = new Date().toISOString().split('T')[0];
+                let todayCompleted = 0;
+                let todayTotal = 0;
+                let weekCompleted = 0;
+                let weekTotal = 0;
+
+                goals.forEach(goal => {
+                    goal.tasks.forEach(task => {
+                        const freq = FREQUENCY_OPTIONS.find(f => f.value === task.frequency);
+                        if (freq) {
+                            // Today's tasks
+                            if (task.frequency === 'daily' || 
+                                (task.frequency === 'workdays' && new Date().getDay() >= 1 && new Date().getDay() <= 5)) {
+                                todayTotal++;
+                                if (completions[`${task.id}_${today}`]) todayCompleted++;
+                            }
+                            // Week's tasks (simplified)
+                            weekTotal += Math.ceil(freq.multiplier / 12);
+                            const weekKey = `week_${currentWeek}_${task.id}`;
+                            weekCompleted += Object.keys(completions).filter(k => 
+                                k.startsWith(task.id) && completions[k]
+                            ).length;
+                        }
+                    });
+                });
+
+                const overallProgress = goals.length > 0 
+                    ? Math.round(goals.reduce((acc, goal) => acc + calculateGoalProgress(goal), 0) / goals.length)
+                    : 0;
+
+                return {
+                    todayCompleted,
+                    todayTotal: Math.max(todayTotal, 1),
+                    weekProgress: weekTotal > 0 ? Math.round((weekCompleted / weekTotal) * 100) : 0,
+                    overallProgress,
+                    goalsCount: goals.length
+                };
+            }, [goals, completions, currentWeek]);
+
+            // Calculate goal progress
+            const calculateGoalProgress = useCallback((goal) => {
+                if (!goal.tasks.length) return 0;
+                
+                let totalExpected = 0;
+                let totalCompleted = 0;
+
+                goal.tasks.forEach(task => {
+                    const freq = FREQUENCY_OPTIONS.find(f => f.value === task.frequency);
+                    if (freq) {
+                        const expectedByNow = Math.ceil((freq.multiplier / 12) * currentWeek);
+                        totalExpected += expectedByNow;
+                        
+                        const completedCount = Object.keys(completions).filter(key => 
+                            key.startsWith(task.id) && completions[key]
+                        ).length;
+                        totalCompleted += completedCount;
+                    }
+                });
+
+                return totalExpected > 0 ? Math.min(Math.round((totalCompleted / totalExpected) * 100), 100) : 0;
+            }, [completions, currentWeek]);
+
+            // Handlers
+            const handleCreateGoal = useCallback((goalData) => {
+                if (goals.length >= 3 && !editingGoal) {
+                    alert('Максимум 3 цели на 12 недель!');
+                    return;
+                }
+
+                if (editingGoal) {
+                    setGoals(prev => prev.map(g => g.id === editingGoal.id ? { ...goalData, id: g.id } : g));
+                } else {
+                    setGoals(prev => [...prev, { ...goalData, id: generateId(), createdAt: new Date().toISOString() }]);
+                }
+                setShowCreateModal(false);
+                setEditingGoal(null);
+            }, [goals.length, editingGoal, setGoals]);
+
+            const handleDeleteGoal = useCallback((goalId) => {
+                if (confirm('Удалить цель? Все данные будут потеряны.')) {
+                    setGoals(prev => prev.filter(g => g.id !== goalId));
+                    setSelectedGoal(null);
+                }
+            }, [setGoals]);
+
+            const handleToggleCompletion = useCallback((taskId, date) => {
+                const key = `${taskId}_${date}`;
+                setCompletions(prev => ({
+                    ...prev,
+                    [key]: !prev[key]
+                }));
+            }, [setCompletions]);
+
+            const handleExport = useCallback(() => {
+                const data = {
+                    goals,
+                    completions,
+                    reviews,
+                    settings,
+                    exportedAt: new Date().toISOString()
+                };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `hustle-year-backup-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }, [goals, completions, reviews, settings]);
+
+            const handleImport = useCallback(() => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            if (data.goals) setGoals(data.goals);
+                            if (data.completions) setCompletions(data.completions);
+                            if (data.reviews) setReviews(data.reviews);
+                            if (data.settings) setSettings(data.settings);
+                            alert('Данные успешно импортированы!');
+                        } catch (err) {
+                            alert('Ошибка импорта файла');
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }, [setGoals, setCompletions, setReviews, setSettings]);
+
+            const handleSaveReview = useCallback((reviewData) => {
+                setReviews(prev => {
+                    const existing = prev.findIndex(r => r.week === currentWeek);
+                    if (existing >= 0) {
+                        const updated = [...prev];
+                        updated[existing] = { ...reviewData, week: currentWeek };
+                        return updated;
+                    }
+                    return [...prev, { ...reviewData, week: currentWeek }];
+                });
+                setShowReviewModal(false);
+            }, [currentWeek, setReviews]);
+
+            // Render helpers
+            const renderContent = () => {
+                if (selectedGoal) {
+                    return (
+                        <GoalDetailView
+                            goal={selectedGoal}
+                            completions={completions}
+                            currentWeek={currentWeek}
+                            onBack={() => setSelectedGoal(null)}
+                            onToggleCompletion={handleToggleCompletion}
+                            onEdit={() => {
+                                setEditingGoal(selectedGoal);
+                                setShowCreateModal(true);
+                            }}
+                            onDelete={() => handleDeleteGoal(selectedGoal.id)}
+                            calculateProgress={calculateGoalProgress}
+                        />
+                    );
+                }
+
+                if (selectedTaskForTracker) {
+                    return (
+                        <TaskTrackerView
+                            task={selectedTaskForTracker.task}
+                            goal={selectedTaskForTracker.goal}
+                            completions={completions}
+                            currentWeek={currentWeek}
+                            settings={settings}
+                            onBack={() => setSelectedTaskForTracker(null)}
+                            onToggleCompletion={handleToggleCompletion}
+                        />
+                    );
+                }
+
+                switch (activeTab) {
+                    case 'home':
+                        return (
+                            <HomeView
+                                goals={goals}
+                                stats={stats}
+                                currentWeek={currentWeek}
+                                onGoalClick={setSelectedGoal}
+                                calculateProgress={calculateGoalProgress}
+                            />
+                        );
+                    case 'analytics':
+                        return (
+                            <AnalyticsView
+                                goals={goals}
+                                completions={completions}
+                                currentWeek={currentWeek}
+                                settings={settings}
+                                calculateProgress={calculateGoalProgress}
+                                onTaskClick={(task, goal) => setSelectedTaskForTracker({ task, goal })}
+                            />
+                        );
+                    case 'review':
+                        return (
+                            <ReviewView
+                                reviews={reviews}
+                                currentWeek={currentWeek}
+                                stats={stats}
+                                onNewReview={() => setShowReviewModal(true)}
+                            />
+                        );
+                    case 'settings':
+                        return (
+                            <SettingsView
+                                settings={settings}
+                                onUpdateSettings={setSettings}
+                                onExport={handleExport}
+                                onImport={handleImport}
+                            />
+                        );
+                    default:
+                        return null;
+                }
+            };
+
+            return (
+                <div className="app">
+                    {/* Header */}
+                    <header className="header">
+                        <div className="header-content">
+                            <div className="logo">HUSTLE YEAR</div>
+                            <div className="week-badge">
+                                <span>Неделя</span>
+                                <span className="week-number">{currentWeek}/12</span>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Main Content */}
+                    <main className="main-content">
+                        {renderContent()}
+                    </main>
+
+                    {/* FAB */}
+                    {activeTab === 'home' && goals.length < 3 && !selectedGoal && (
+                        <button className="fab" onClick={() => setShowCreateModal(true)}>
+                            <Icons.Plus />
+                        </button>
+                    )}
+
+                    {/* Bottom Navigation */}
+                    {!selectedGoal && !selectedTaskForTracker && (
+                        <nav className="bottom-nav">
+                            <div className="nav-content">
+                                <button 
+                                    className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('home')}
+                                >
+                                    <Icons.Home />
+                                    <span>Обзор</span>
+                                </button>
+                                <button 
+                                    className={`nav-item ${activeTab === 'analytics' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('analytics')}
+                                >
+                                    <Icons.Chart />
+                                    <span>Аналитика</span>
+                                </button>
+                                <button 
+                                    className={`nav-item ${activeTab === 'review' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('review')}
+                                >
+                                    <Icons.Calendar />
+                                    <span>Рефлексия</span>
+                                </button>
+                                <button 
+                                    className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('settings')}
+                                >
+                                    <Icons.Settings />
+                                    <span>Ещё</span>
+                                </button>
+                            </div>
+                        </nav>
+                    )}
+
+                    {/* Create/Edit Goal Modal */}
+                    {showCreateModal && (
+                        <CreateGoalModal
+                            editingGoal={editingGoal}
+                            onClose={() => {
+                                setShowCreateModal(false);
+                                setEditingGoal(null);
+                            }}
+                            onSave={handleCreateGoal}
+                        />
+                    )}
+
+                    {/* Weekly Review Modal */}
+                    {showReviewModal && (
+                        <WeeklyReviewModal
+                            currentWeek={currentWeek}
+                            existingReview={reviews.find(r => r.week === currentWeek)}
+                            stats={stats}
+                            onClose={() => setShowReviewModal(false)}
+                            onSave={handleSaveReview}
+                        />
+                    )}
+                </div>
+            );
+        }
+
+        // ===== HOME VIEW =====
+        function HomeView({ goals, stats, currentWeek, onGoalClick, calculateProgress }) {
+            const daysLeft = (12 - currentWeek) * 7;
+
+            return (
+                <div className="fade-in">
+                    {/* Stats */}
+                    <div className="stats-bar">
+                        <div className="stat-card">
+                            <div className="stat-value blue">{stats.todayCompleted}/{stats.todayTotal}</div>
+                            <div className="stat-label">Сегодня</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-value green">{stats.overallProgress}%</div>
+                            <div className="stat-label">Прогресс</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-value yellow">{daysLeft}</div>
+                            <div className="stat-label">Дней</div>
+                        </div>
+                    </div>
+
+                    {/* Goals */}
+                    <div className="section-header">
+                        <span className="section-title">Мои цели ({goals.length}/3)</span>
+                    </div>
+
+                    {goals.length === 0 ? (
+                        <div className="empty-state">
+                            <Icons.Target />
+                            <h3 className="empty-title">Начни свой путь</h3>
+                            <p className="empty-text">
+                                Добавь до 3 целей на 12 недель. Помни: меньше целей — больше фокус.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="goals-container">
+                            {goals.map((goal, index) => (
+                                <GoalCard
+                                    key={goal.id}
+                                    goal={goal}
+                                    progress={calculateProgress(goal)}
+                                    onClick={() => onGoalClick(goal)}
+                                    delay={index * 0.1}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // ===== GOAL CARD =====
+        function GoalCard({ goal, progress, onClick, delay }) {
+            return (
+                <div 
+                    className="goal-card slide-in" 
+                    onClick={onClick}
+                    style={{ animationDelay: `${delay}s` }}
+                >
+                    <div className="goal-header">
+                        <h3 className="goal-title">{goal.title}</h3>
+                    </div>
+
+                    <div className="goal-progress">
+                        <div className="progress-header">
+                            <span className="progress-label">Прогресс</span>
+                            <span className="progress-value">{progress}%</span>
+                        </div>
+                        <div className="progress-bar">
+                            <div className="progress-fill" style={{ width: `${progress}%` }} />
+                        </div>
+                    </div>
+
+                    <div className="goal-tasks-preview">
+                        {goal.tasks.slice(0, 3).map(task => (
+                            <span key={task.id} className="task-chip">
+                                {task.name}
+                            </span>
+                        ))}
+                        {goal.tasks.length > 3 && (
+                            <span className="task-chip">+{goal.tasks.length - 3}</span>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // ===== GOAL DETAIL VIEW =====
+        function GoalDetailView({ goal, completions, currentWeek, onBack, onToggleCompletion, onEdit, onDelete, calculateProgress }) {
+            const [showMenu, setShowMenu] = useState(false);
+            const today = new Date().toISOString().split('T')[0];
+            const progress = calculateProgress(goal);
+
+            const getTodayTasks = () => {
+                const dayOfWeek = new Date().getDay();
+                return goal.tasks.filter(task => {
+                    if (task.frequency === 'daily') return true;
+                    if (task.frequency === 'workdays' && dayOfWeek >= 1 && dayOfWeek <= 5) return true;
+                    if (task.frequency === 'weekly') return dayOfWeek === 1;
+                    if (task.frequency === 'twice-week') return dayOfWeek === 1 || dayOfWeek === 4;
+                    if (task.frequency === 'three-week') return dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 5;
+                    return false;
+                });
+            };
+
+            const todayTasks = getTodayTasks();
+
+            return (
+                <div className="fade-in">
+                    <div className="detail-header">
+                        <button className="back-btn" onClick={onBack}>
+                            <Icons.ChevronLeft />
+                            <span>Назад</span>
+                        </button>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <h1 className="detail-title">{goal.title}</h1>
+                            <div style={{ position: 'relative' }}>
+                                <button 
+                                    className="goal-menu-btn" 
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setShowMenu(!showMenu);
+                                    }}
+                                >
+                                    <Icons.MoreVertical />
+                                </button>
+                                {showMenu && (
+                                    <div className="dropdown">
+                                        <div className="dropdown-item" onClick={onEdit}>
+                                            <Icons.Edit />
+                                            <span>Редактировать</span>
+                                        </div>
+                                        <div className="dropdown-item danger" onClick={onDelete}>
+                                            <Icons.Trash />
+                                            <span>Удалить</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="detail-progress">
+                            <div className="detail-progress-header">
+                                <div>
+                                    <div className="detail-progress-value">{progress}%</div>
+                                    <div className="detail-progress-label">выполнено</div>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div style={{ fontSize: '14px', fontWeight: 600 }}>Неделя {currentWeek}</div>
+                                    <div className="detail-progress-label">из 12</div>
+                                </div>
+                            </div>
+                            <div className="progress-bar" style={{ height: 8 }}>
+                                <div className="progress-fill" style={{ width: `${progress}%` }} />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="task-section">
+                        <div className="section-header">
+                            <span className="section-title">Задачи на сегодня</span>
+                        </div>
+
+                        {todayTasks.length === 0 ? (
+                            <div style={{ 
+                                padding: 20, 
+                                textAlign: 'center', 
+                                color: 'var(--text-tertiary)',
+                                background: 'var(--bg-glass)',
+                                borderRadius: 'var(--radius-md)'
+                            }}>
+                                Нет задач на сегодня
+                            </div>
+                        ) : (
+                            todayTasks.map(task => {
+                                const isCompleted = completions[`${task.id}_${today}`];
+                                const freq = FREQUENCY_OPTIONS.find(f => f.value === task.frequency);
+                                
+                                return (
+                                    <div 
+                                        key={task.id} 
+                                        className={`task-item ${isCompleted ? 'completed' : ''}`}
+                                    >
+                                        <button
+                                            className={`task-checkbox ${isCompleted ? 'checked' : ''}`}
+                                            onClick={() => onToggleCompletion(task.id, today)}
+                                        >
+                                            <Icons.Check />
+                                        </button>
+                                        <div className="task-content">
+                                            <div className="task-name">{task.name}</div>
+                                            <div className="task-frequency">{freq?.label}</div>
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        )}
+
+                        <div className="section-header" style={{ marginTop: 32 }}>
+                            <span className="section-title">Все задачи</span>
+                        </div>
+
+                        {goal.tasks.map(task => {
+                            const freq = FREQUENCY_OPTIONS.find(f => f.value === task.frequency);
+                            const completedCount = Object.keys(completions).filter(key => 
+                                key.startsWith(task.id) && completions[key]
+                            ).length;
+
+                            return (
+                                <div key={task.id} className="task-item">
+                                    <div className="task-content">
+                                        <div className="task-name">{task.name}</div>
+                                        <div className="task-frequency">{freq?.label}</div>
+                                    </div>
+                                    <div className="task-streak">
+                                        <Icons.Flame />
+                                        {completedCount}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        }
+
+        // ===== ANALYTICS VIEW =====
+        function AnalyticsView({ goals, completions, currentWeek, settings, calculateProgress, onTaskClick }) {
+            return (
+                <div className="fade-in">
+                    <div className="section-header">
+                        <span className="section-title">Общий прогресс</span>
+                    </div>
+
+                    <div className="analytics-section">
+                        {goals.map(goal => (
+                            <div key={goal.id} className="analytics-card" style={{ marginBottom: 16 }}>
+                                <div className="analytics-title">{goal.title}</div>
+                                <div style={{ marginBottom: 16 }}>
+                                    <div className="progress-header">
+                                        <span className="progress-label">Выполнено</span>
+                                        <span className="progress-value">{calculateProgress(goal)}%</span>
+                                    </div>
+                                    <div className="progress-bar" style={{ height: 8 }}>
+                                        <div className="progress-fill" style={{ width: `${calculateProgress(goal)}%` }} />
+                                    </div>
+                                </div>
+
+                                <div className="section-header" style={{ marginBottom: 12 }}>
+                                    <span className="section-title" style={{ fontSize: 11 }}>Детали по задачам</span>
+                                </div>
+
+                                {goal.tasks.map(task => {
+                                    const freq = FREQUENCY_OPTIONS.find(f => f.value === task.frequency);
+                                    const totalExpected = freq ? freq.multiplier : 0;
+                                    const completedCount = Object.keys(completions).filter(key => 
+                                        key.startsWith(task.id) && completions[key]
+                                    ).length;
+                                    const taskProgress = totalExpected > 0 ? Math.round((completedCount / totalExpected) * 100) : 0;
+
+                                    return (
+                                        <div 
+                                            key={task.id} 
+                                            className="task-item"
+                                            onClick={() => onTaskClick(task, goal)}
+                                            style={{ cursor: 'pointer' }}
+                                        >
+                                            <div className="task-content">
+                                                <div className="task-name">{task.name}</div>
+                                                <div className="task-frequency">
+                                                    {completedCount} из {totalExpected} ({taskProgress}%)
+                                                </div>
+                                            </div>
+                                            <Icons.ChevronRight />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ))}
+
+                        {goals.length === 0 && (
+                            <div className="empty-state">
+                                <Icons.Chart />
+                                <h3 className="empty-title">Нет данных</h3>
+                                <p className="empty-text">Добавь цели, чтобы видеть аналитику</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // ===== TASK TRACKER VIEW =====
+        function TaskTrackerView({ task, goal, completions, currentWeek, settings, onBack, onToggleCompletion }) {
+            const freq = FREQUENCY_OPTIONS.find(f => f.value === task.frequency);
+            const totalExpected = freq ? freq.multiplier : 0;
+            const completedCount = Object.keys(completions).filter(key => 
+                key.startsWith(task.id) && completions[key]
+            ).length;
+
+            // Generate all dates for the 12-week period
+            const generateDates = () => {
+                const dates = [];
+                const startDate = new Date(settings.startDate);
+                
+                for (let i = 0; i < 84; i++) {
+                    const date = new Date(startDate);
+                    date.setDate(startDate.getDate() + i);
+                    dates.push(date.toISOString().split('T')[0]);
+                }
+                return dates;
+            };
+
+            const allDates = generateDates();
+            const today = new Date().toISOString().split('T')[0];
+
+            return (
+                <div className="fade-in">
+                    <div className="detail-header">
+                        <button className="back-btn" onClick={onBack}>
+                            <Icons.ChevronLeft />
+                            <span>Назад</span>
+                        </button>
+
+                        <h1 className="detail-title">{task.name}</h1>
+                        <p style={{ color: 'var(--text-tertiary)', fontSize: 14, marginBottom: 16 }}>
+                            {goal.title}
+                        </p>
+
+                        <div className="tracker-summary">
+                            <div className="tracker-stat">
+                                <div className="tracker-stat-value" style={{ color: 'var(--accent-green)' }}>
+                                    {completedCount}
+                                </div>
+                                <div className="tracker-stat-label">Выполнено</div>
+                            </div>
+                            <div className="tracker-stat">
+                                <div className="tracker-stat-value" style={{ color: 'var(--accent-blue)' }}>
+                                    {totalExpected}
+                                </div>
+                                <div className="tracker-stat-label">Всего</div>
+                            </div>
+                            <div className="tracker-stat">
+                                <div className="tracker-stat-value" style={{ color: 'var(--accent-yellow)' }}>
+                                    {totalExpected - completedCount}
+                                </div>
+                                <div className="tracker-stat-label">Осталось</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="task-section">
+                        <div className="section-header">
+                            <span className="section-title">Визуальный трекер</span>
+                        </div>
+
+                        <div className="analytics-card">
+                            <div className="tracker-grid">
+                                {Array.from({ length: totalExpected }).map((_, index) => {
+                                    // Find the corresponding date for this cell
+                                    const dateIndex = Math.floor(index * (84 / totalExpected));
+                                    const date = allDates[dateIndex];
+                                    const isCompleted = index < completedCount;
+                                    const isPast = date && date < today;
+
+                                    return (
+                                        <div
+                                            key={index}
+                                            className={`tracker-cell ${isCompleted ? 'completed' : ''}`}
+                                            title={date ? formatDate(date) : ''}
+                                        >
+                                            {isCompleted && <Icons.Check />}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            <div style={{ 
+                                marginTop: 16, 
+                                display: 'flex', 
+                                justifyContent: 'space-between',
+                                fontSize: 12,
+                                color: 'var(--text-tertiary)'
+                            }}>
+                                <span>Прогресс: {Math.round((completedCount / totalExpected) * 100)}%</span>
+                                <span>{freq?.label}</span>
+                            </div>
+                        </div>
+
+                        <div className="section-header" style={{ marginTop: 24 }}>
+                            <span className="section-title">Календарь активности</span>
+                        </div>
+
+                        <div className="analytics-card">
+                            <div className="heatmap">
+                                {allDates.slice(0, 84).map((date, index) => {
+                                    const isCompleted = completions[`${task.id}_${date}`];
+                                    const isPast = date < today;
+                                    const isFuture = date > today;
+
+                                    let level = '';
+                                    if (isCompleted) level = 'level-4';
+                                    else if (isPast && !isFuture) level = 'missed';
+
+                                    return (
+                                        <div
+                                            key={date}
+                                            className={`heatmap-day ${level}`}
+                                            title={formatDate(date)}
+                                            onClick={() => !isFuture && onToggleCompletion(task.id, date)}
+                                            style={{ cursor: isFuture ? 'default' : 'pointer' }}
+                                        />
+                                    );
+                                })}
+                            </div>
+                            <div className="heatmap-legend">
+                                <span>Меньше</span>
+                                <div className="heatmap-legend-item" style={{ background: 'var(--bg-tertiary)' }} />
+                                <div className="heatmap-legend-item" style={{ background: 'rgba(239, 68, 68, 0.3)' }} />
+                                <div className="heatmap-legend-item" style={{ background: 'var(--accent-green)' }} />
+                                <span>Больше</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ===== REVIEW VIEW =====
+        function ReviewView({ reviews, currentWeek, stats, onNewReview }) {
+            const currentReview = reviews.find(r => r.week === currentWeek);
+
+            return (
+                <div className="fade-in">
+                    <div className="section-header">
+                        <span className="section-title">Еженедельная рефлексия</span>
+                    </div>
+
+                    <div className="analytics-card" style={{ marginBottom: 24 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                            <div>
+                                <div style={{ fontSize: 14, fontWeight: 600 }}>Неделя {currentWeek}</div>
+                                <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
+                                    {currentReview ? 'Отчёт заполнен' : 'Отчёт не заполнен'}
+                                </div>
+                            </div>
+                            <button className="btn btn-primary" onClick={onNewReview} style={{ flex: 'none', padding: '10px 16px' }}>
+                                {currentReview ? 'Обновить' : 'Заполнить'}
+                            </button>
+                        </div>
+
+                        <div style={{ 
+                            display: 'grid', 
+                            gridTemplateColumns: 'repeat(2, 1fr)', 
+                            gap: 12 
+                        }}>
+                            <div style={{ 
+                                padding: 12, 
+                                background: 'var(--bg-glass)', 
+                                borderRadius: 'var(--radius-sm)',
+                                textAlign: 'center'
+                            }}>
+                                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--accent-blue)' }}>
+                                    {stats.overallProgress}%
+                                </div>
+                                <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>ПРОГРЕСС</div>
+                            </div>
+                            <div style={{ 
+                                padding: 12, 
+                                background: 'var(--bg-glass)', 
+                                borderRadius: 'var(--radius-sm)',
+                                textAlign: 'center'
+                            }}>
+                                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--accent-green)' }}>
+                                    {stats.goalsCount}
+                                </div>
+                                <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>ЦЕЛЕЙ</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="section-header">
+                        <span className="section-title">История отчётов</span>
+                    </div>
+
+                    {reviews.length === 0 ? (
+                        <div className="empty-state" style={{ padding: 40 }}>
+                            <Icons.Calendar />
+                            <h3 className="empty-title">Нет отчётов</h3>
+                            <p className="empty-text">Заполняй еженедельные отчёты для рефлексии</p>
+                        </div>
+                    ) : (
+                        reviews.sort((a, b) => b.week - a.week).map(review => (
+                            <div key={review.week} className="review-card">
+                                <div className="review-header">
+                                    <span className="review-week">Неделя {review.week}</span>
+                                    <span className="review-score">{review.score}%</span>
+                                </div>
+                                {review.wins && (
+                                    <div style={{ marginBottom: 12 }}>
+                                        <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 4 }}>Победы</div>
+                                        <div style={{ fontSize: 14 }}>{review.wins}</div>
+                                    </div>
+                                )}
+                                {review.improvements && (
+                                    <div>
+                                        <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 4 }}>Над чем работать</div>
+                                        <div style={{ fontSize: 14 }}>{review.improvements}</div>
+                                    </div>
+                                )}
+                            </div>
+                        ))
+                    )}
+                </div>
+            );
+        }
+
+        // ===== SETTINGS VIEW =====
+        function SettingsView({ settings, onUpdateSettings, onExport, onImport }) {
+            return (
+                <div className="fade-in">
+                    <div className="section-header">
+                        <span className="section-title">Настройки</span>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Дата начала 12 недель</label>
+                        <input
+                            type="date"
+                            className="form-input"
+                            value={settings.startDate}
+                            onChange={(e) => onUpdateSettings({ ...settings, startDate: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="section-header" style={{ marginTop: 32 }}>
+                        <span className="section-title">Данные</span>
+                    </div>
+
+                    <div className="settings-item" onClick={onExport}>
+                        <div className="settings-item-content">
+                            <div className="settings-icon">
+                                <Icons.Download />
+                            </div>
+                            <div>
+                                <div className="settings-label">Экспорт данных</div>
+                                <div className="settings-description">Сохранить бэкап в JSON</div>
+                            </div>
+                        </div>
+                        <Icons.ChevronRight />
+                    </div>
+
+                    <div className="settings-item" onClick={onImport}>
+                        <div className="settings-item-content">
+                            <div className="settings-icon">
+                                <Icons.Upload />
+                            </div>
+                            <div>
+                                <div className="settings-label">Импорт данных</div>
+                                <div className="settings-description">Загрузить из файла</div>
+                            </div>
+                        </div>
+                        <Icons.ChevronRight />
+                    </div>
+
+                    <div style={{ 
+                        marginTop: 40, 
+                        textAlign: 'center', 
+                        color: 'var(--text-tertiary)',
+                        fontSize: 12
+                    }}>
+                        <p>HUSTLE YEAR v1.0</p>
+                        <p style={{ marginTop: 4 }}>Основано на методологии "12 Week Year"</p>
+                        <p style={{ marginTop: 4 }}>by Brian Moran</p>
+                    </div>
+                </div>
+            );
+        }
+
+        // ===== CREATE GOAL MODAL =====
+        function CreateGoalModal({ editingGoal, onClose, onSave }) {
+            const [title, setTitle] = useState(editingGoal?.title || '');
+            const [tasks, setTasks] = useState(
+                editingGoal?.tasks || [{ id: generateId(), name: '', frequency: 'daily' }]
+            );
+
+            const handleAddTask = () => {
+                setTasks([...tasks, { id: generateId(), name: '', frequency: 'daily' }]);
+            };
+
+            const handleRemoveTask = (taskId) => {
+                if (tasks.length > 1) {
+                    setTasks(tasks.filter(t => t.id !== taskId));
+                }
+            };
+
+            const handleTaskChange = (taskId, field, value) => {
+                setTasks(tasks.map(t => 
+                    t.id === taskId ? { ...t, [field]: value } : t
+                ));
+            };
+
+            const handleSave = () => {
+                if (!title.trim()) {
+                    alert('Введи название цели');
+                    return;
+                }
+                if (tasks.some(t => !t.name.trim())) {
+                    alert('Заполни все задачи');
+                    return;
+                }
+                onSave({ title, tasks });
+            };
+
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2 className="modal-title">
+                                {editingGoal ? 'Редактировать цель' : 'Новая цель'}
+                            </h2>
+                            <button className="modal-close" onClick={onClose}>
+                                <Icons.X />
+                            </button>
+                        </div>
+
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label className="form-label">Название цели</label>
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    placeholder="Например: Запустить онлайн-курс"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">Действия для достижения</label>
+                                <div className="tasks-list">
+                                    {tasks.map((task, index) => (
+                                        <div key={task.id} className="task-input-row">
+                                            <input
+                                                type="text"
+                                                className="form-input"
+                                                placeholder={`Задача ${index + 1}`}
+                                                value={task.name}
+                                                onChange={(e) => handleTaskChange(task.id, 'name', e.target.value)}
+                                            />
+                                            <select
+                                                className="form-input form-select"
+                                                value={task.frequency}
+                                                onChange={(e) => handleTaskChange(task.id, 'frequency', e.target.value)}
+                                            >
+                                                {FREQUENCY_OPTIONS.map(opt => (
+                                                    <option key={opt.value} value={opt.value}>
+                                                        {opt.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            {tasks.length > 1 && (
+                                                <button 
+                                                    className="remove-btn"
+                                                    onClick={() => handleRemoveTask(task.id)}
+                                                >
+                                                    <Icons.X />
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                    <button className="add-task-btn" onClick={handleAddTask}>
+                                        <Icons.Plus />
+                                        <span>Добавить действие</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="modal-footer">
+                            <button className="btn btn-secondary" onClick={onClose}>
+                                Отмена
+                            </button>
+                            <button className="btn btn-primary" onClick={handleSave}>
+                                {editingGoal ? 'Сохранить' : 'Создать цель'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ===== WEEKLY REVIEW MODAL =====
+        function WeeklyReviewModal({ currentWeek, existingReview, stats, onClose, onSave }) {
+            const [score, setScore] = useState(existingReview?.score || stats.overallProgress);
+            const [wins, setWins] = useState(existingReview?.wins || '');
+            const [improvements, setImprovements] = useState(existingReview?.improvements || '');
+            const [nextWeek, setNextWeek] = useState(existingReview?.nextWeek || '');
+
+            const handleSave = () => {
+                onSave({ score, wins, improvements, nextWeek });
+            };
+
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2 className="modal-title">Рефлексия — Неделя {currentWeek}</h2>
+                            <button className="modal-close" onClick={onClose}>
+                                <Icons.X />
+                            </button>
+                        </div>
+
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label className="form-label">Оценка недели (0-100%)</label>
+                                <input
+                                    type="number"
+                                    className="form-input"
+                                    min="0"
+                                    max="100"
+                                    value={score}
+                                    onChange={(e) => setScore(Math.min(100, Math.max(0, parseInt(e.target.value) || 0)))}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">🏆 Что получилось на этой неделе?</label>
+                                <textarea
+                                    className="form-input"
+                                    placeholder="Опиши свои победы..."
+                                    value={wins}
+                                    onChange={(e) => setWins(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">🔧 Над чем нужно поработать?</label>
+                                <textarea
+                                    className="form-input"
+                                    placeholder="Что можно улучшить..."
+                                    value={improvements}
+                                    onChange={(e) => setImprovements(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">🎯 Фокус на следующую неделю</label>
+                                <textarea
+                                    className="form-input"
+                                    placeholder="Главные приоритеты..."
+                                    value={nextWeek}
+                                    onChange={(e) => setNextWeek(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="modal-footer">
+                            <button className="btn btn-secondary" onClick={onClose}>
+                                Отмена
+                            </button>
+                            <button className="btn btn-primary" onClick={handleSave}>
+                                Сохранить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ===== RENDER =====
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
